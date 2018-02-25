@@ -1,0 +1,33 @@
+.board-wrapper {
+	padding: 2px;
+	border: 1px solid #bbb;
+	display: inline-block;
+}
+
+.board {
+	border-collapse: collapse;
+	border: 0;
+}
+
+.cell {
+	width: 32px;
+	height: 32px;
+	border: 1px solid #f3f3f3;
+}
+
+.cell.cell-food {
+	background-color: black;
+	animation: 1s infinite Fade-in-out;
+}
+
+@keyframes Fade-in-out {
+	0% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.7;
+	}
+	100% {
+		opacity: 1;
+	}
+}
