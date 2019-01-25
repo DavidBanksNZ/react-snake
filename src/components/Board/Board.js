@@ -71,7 +71,7 @@ class Board extends Component {
 
 	componentDidMount() {
 		this.props.newGame();
-		document.addEventListener('keyup', event => this.onKeyUp(event));
+		document.addEventListener('keydown', event => this.onKeyPress(event));
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -82,9 +82,6 @@ class Board extends Component {
 
 		if (nextProps.gameId !== this.props.gameId) {
 			this.startTimer();
-		} else if (nextProps.gameStatus === GameStatus.GAME_OVER) {
-			this.stopTimer();
-			console.log('Game over')
 		}
 	}
 
@@ -92,8 +89,13 @@ class Board extends Component {
 		this.stopTimer();
 		this.setState({
 			timer: setInterval(() => {
-				this.props.tick();
-			}, 700)
+				if (this.props.gameStatus === GameStatus.GAME_OVER) {
+					this.stopTimer();
+					console.log('Game over')
+				} else {
+					this.props.tick();
+				}
+			}, 600)
 		})
 	}
 
@@ -105,9 +107,15 @@ class Board extends Component {
 
 	getCellClassNames(row, col) {
 		const classes = ['cell'];
+		const snakeIndex = this.state.snakeStringCells.indexOf([row, col].toString());
 
-		if (this.state.snakeStringCells.indexOf([row, col].toString()) > -1) {
+		if (snakeIndex > -1) {
 			classes.push('cell-snake');
+
+			if (snakeIndex === this.state.snakeStringCells.length - 1) {
+				classes.push('snake-tail');
+			}
+
 		}
 		else if (this.props.food && this.props.food.toString() === [row, col].toString()) {
 			classes.push('cell-food');
@@ -132,22 +140,39 @@ class Board extends Component {
 		}
 	}
 
-	onKeyUp(event) {
+	onKeyPress(event) {
 		if (this.props.gameStatus !== GameStatus.IN_PROGRESS) {
 			return;
 		}
-		if (event.keyCode === 37 && this.props.direction !== Direction.RIGHT) {
-			this.props.moveLeft();
-			this.startTimer();
-		} else if (event.keyCode === 38 && this.props.direction !== Direction.DOWN) {
-			this.props.moveUp();
-			this.startTimer();
-		} else if (event.keyCode === 39 && this.props.direction !== Direction.LEFT) {
-			this.props.moveRight();
-			this.startTimer();
-		} else if (event.keyCode === 40 && this.props.direction !== Direction.UP) {
-			this.props.moveDown();
-			this.startTimer();
+		if (event.keyCode === 37) {
+
+			if (this.props.snake.length === 1 || this.props.direction !== Direction.RIGHT) {
+				this.props.moveLeft();
+				console.log('start timer')
+				this.startTimer();
+			}
+
+		} else if (event.keyCode === 38) {
+
+			if (this.props.snake.length === 1 || this.props.direction !== Direction.DOWN) {
+				this.props.moveUp();
+				this.startTimer();
+			}
+
+		} else if (event.keyCode === 39) {
+
+			if (this.props.snake.length === 1 || this.props.direction !== Direction.LEFT) {
+				this.props.moveRight();
+				this.startTimer();
+			}
+
+		} else if (event.keyCode === 40) {
+
+			if (this.props.snake.length === 1 || this.props.direction !== Direction.UP) {
+				this.props.moveDown();
+				this.startTimer();
+			}
+
 		}
 	}
 
